@@ -1,6 +1,6 @@
 #!/usr/bin/perl -l
 
-## update the round robin database
+##  parse Iptraf logs and insert metrics into graphite
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Time::Local;
 my $site = "home";
 my $timestamp = 0;
 
-my $GRAPHITEHOST="graphite.bigg33k.net";
+my $GRAPHITEHOST="YOUR.GRAPHITE.HOST";
 my $GRAPHITEPORT=2003;
 
 my $sock = IO::Socket::INET->new(
@@ -22,7 +22,6 @@ my $sock = IO::Socket::INET->new(
 );
 die "Unable to connect: $!\n" unless ($sock->connected);
 
-my @PORTS = qw ( 22 25 76 68 993 81 123 80 119 443  );
 my $LAST = `rrdtool last /home/dave/tcp_services.rrd`;
 chomp $LAST;
 
