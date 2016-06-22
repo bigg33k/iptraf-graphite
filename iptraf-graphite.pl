@@ -12,7 +12,7 @@ use Time::Local;
 my $site = "home";
 my $timestamp = 0;
 
-my $GRAPHITEHOST="graphite.bigg33k.net";
+my $GRAPHITEHOST="YOUR.GRAPHITE.HOST";
 my $GRAPHITEPORT=2003;
 
 my $sock = IO::Socket::INET->new(
