@@ -9,6 +9,8 @@ use IO::File;
 use IO::Socket::INET;
 use Time::Local;
 
+
+my $DEBUG=0;
 my $site = "home";
 my $timestamp = 0;
 
@@ -31,7 +33,7 @@ my $fh = IO::File->new('/var/log/iptraf/tcp_udp_services-eth0.log')
 while (<$fh>) {
     if ( m/service monitor started/ ) { _reset( $_ ); }
     next unless ( m/^\*\*\*/ );
-    my $hash = _parse( $_, $fh );
+    _parse( $_, $fh );
 }
 
 ## translate iptraf's time string into unixtime
@@ -64,11 +66,12 @@ sub _get_time {
 sub _parse {
     my ($header, $fh) = @_;
 
-    my %hash;
-    $hash{_time} = _get_time( ($header =~ m/generated (.*)/)[0] );
+    my $logtime;
 
-    return unless $hash{_time} > $LAST + 60;
-    $timestamp= $hash{_time};
+    $logtime = _get_time( ($header =~ m/generated (.*)/)[0] );
+
+    return unless $logtime > $LAST + 60;
+    $timestamp = $logtime;
 
     while (<$fh>) {
         last if ( m/^Running/ );
@@ -84,18 +87,20 @@ sub _parse {
 	$sock->send ("iptraf.$site.$proto.$port.bytes_in $byte_in $timestamp\n"); 
 	$sock->send ("iptraf.$site.$proto.$port.packets_out $pack_out  $timestamp\n"); 
 	$sock->send ("iptraf.$site.$proto.$port.bytes_out $byte_out $timestamp\n");	
-        $hash{$port} = [$byte_in, $byte_out];
+        print ("iptraf.$site.$proto.$port.packets $packs $timestamp\n") if $DEBUG;
+        print ("iptraf.$site.$proto.$port.bytes_total $bytes $timestamp\n") if $DEBUG;
+        print ("iptraf.$site.$proto.$port.packets_in $pack_in  $timestamp\n") if $DEBUG;
+        print ("iptraf.$site.$proto.$port.bytes_in $byte_in $timestamp\n") if $DEBUG;
+        print ("iptraf.$site.$proto.$port.packets_out $pack_out  $timestamp\n") if $DEBUG;
+        print ("iptraf.$site.$proto.$port.bytes_out $byte_out $timestamp\n") if $DEBUG;
     }
 
-    return \%hash;
 }
 
 ## iptraf has restarted, put 'U' (unknown) in db.
 sub _reset {
     my ($line) = @_;
 
-    my %hash;
-    $hash{_time} = _get_time( (split( /;/, $line))[0] );
 }
 
 
