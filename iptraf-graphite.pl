@@ -9,14 +9,18 @@ use IO::File;
 use IO::Socket::INET;
 use Time::Local;
 use Net::Statsd;
-
-
-my $DEBUG=1;
-my $site = "home";
-my $timestamp = 0;
+use Time::HiRes;
 
 my $GRAPHITEHOST="YOUR.GRAPHITE.HOST";
 my $GRAPHITEPORT=2003;
+$Net::Statsd::HOST = $GRAPHITEHOST;
+$Net::Statsd::PORT = 8125;
+
+my $start_time = [ Time::HiRes::gettimeofday ];
+my $DEBUG=0;
+my $site = "home";
+my $timestamp = 0;
+
 
 my $sock = IO::Socket::INET->new(
         PeerAddr => $GRAPHITEHOST,
@@ -36,9 +40,11 @@ while (<$fh>) {
     next unless ( m/^\*\*\*/ );
     _parse( $_, $fh );
 }
-
+Net::Statsd::timing('iptraf.overall', Time::HiRes::tv_interval($start_time) * 1000);
 ## translate iptraf's time string into unixtime
 sub _get_time {
+
+    my $start_get_time = [ Time::HiRes::gettimeofday ];
     my ($input) = @_;
 
     my ($day, $month, $date, $hour, $minute, $second, $year) = 
@@ -59,12 +65,15 @@ sub _get_time {
 
     die "Bad date $input" unless defined ( $month );
 
+    Net::Statsd::timing('iptraf.get_time', Time::HiRes::tv_interval($start_get_time) * 1000);
     return timelocal( $second, $minute, $hour, $date, $month, $year );
 }
 
 ## parse the log to the end.  small race condition if we start reading
 ## log file while iptraf is writing?
 sub _parse {
+
+    my $start_parse_time = [ Time::HiRes::gettimeofday ];
     my ($header, $fh) = @_;
 
     my $logtime;
@@ -96,6 +105,7 @@ sub _parse {
         print ("iptraf.$site.$proto.$port.bytes_out $byte_out $timestamp\n") if $DEBUG;
     }
 
+    Net::Statsd::timing('iptraf.parse', Time::HiRes::tv_interval($start_parse_time) * 1000);
 }
 
 ## iptraf has restarted, put 'U' (unknown) in db.
