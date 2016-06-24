@@ -8,9 +8,10 @@ use warnings;
 use IO::File;
 use IO::Socket::INET;
 use Time::Local;
+use Net::Statsd;
 
 
-my $DEBUG=0;
+my $DEBUG=1;
 my $site = "home";
 my $timestamp = 0;
 
@@ -24,8 +25,8 @@ my $sock = IO::Socket::INET->new(
 );
 die "Unable to connect: $!\n" unless ($sock->connected);
 
-my $LAST = `rrdtool last /home/dave/tcp_services.rrd`;
-chomp $LAST;
+my $LASTHOUR=time()-(5000);
+print "starting at $LASTHOUR\n" if $DEBUG;
 
 my $fh = IO::File->new('/var/log/iptraf/tcp_udp_services-eth0.log')
     or die "Can't open logfile";
@@ -67,10 +68,10 @@ sub _parse {
     my ($header, $fh) = @_;
 
     my $logtime;
+    my $worktime;
 
     $logtime = _get_time( ($header =~ m/generated (.*)/)[0] );
-
-    return unless $logtime > $LAST + 60;
+    return unless $logtime > $LASTHOUR + 60;
     $timestamp = $logtime;
 
     while (<$fh>) {
