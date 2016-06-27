@@ -40,7 +40,7 @@ while (<$fh>) {
     next unless ( m/^\*\*\*/ );
     _parse( $_, $fh );
 }
-Net::Statsd::timing('iptraf.'.$site.'.overall', Time::HiRes::tv_interval($start_time) * 1000);
+Net::Statsd::timing('iptraf.'.$site.'.main', Time::HiRes::tv_interval($start_time) * 1000);
 ## translate iptraf's time string into unixtime
 sub _get_time {
 
