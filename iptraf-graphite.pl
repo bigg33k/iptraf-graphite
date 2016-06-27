@@ -40,7 +40,7 @@ while (<$fh>) {
     next unless ( m/^\*\*\*/ );
     _parse( $_, $fh );
 }
-Net::Statsd::timing('iptraf.overall', Time::HiRes::tv_interval($start_time) * 1000);
+Net::Statsd::timing('iptraf.'.$site.'.overall', Time::HiRes::tv_interval($start_time) * 1000);
 ## translate iptraf's time string into unixtime
 sub _get_time {
 
@@ -65,7 +65,7 @@ sub _get_time {
 
     die "Bad date $input" unless defined ( $month );
 
-    Net::Statsd::timing('iptraf.get_time', Time::HiRes::tv_interval($start_get_time) * 1000);
+    Net::Statsd::timing('iptraf.'.$site.'.get_time', Time::HiRes::tv_interval($start_get_time) * 1000);
     return timelocal( $second, $minute, $hour, $date, $month, $year );
 }
 
@@ -105,7 +105,7 @@ sub _parse {
         print ("iptraf.$site.$proto.$port.bytes_out $byte_out $timestamp\n") if $DEBUG;
     }
 
-    Net::Statsd::timing('iptraf.parse', Time::HiRes::tv_interval($start_parse_time) * 1000);
+    Net::Statsd::timing('iptraf.'.$site.'.parse', Time::HiRes::tv_interval($start_parse_time) * 1000);
 }
 
 ## iptraf has restarted, put 'U' (unknown) in db.
