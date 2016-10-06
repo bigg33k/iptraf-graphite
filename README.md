@@ -1,4 +1,5 @@
 # iptraf-graphite
+[![Build Status](https://travis-ci.org/bigg33k/iptraf-graphite.svg?branch=master)](https://travis-ci.org/bigg33k/iptraf-graphite)
 
 Largley based on http://www.taedium.com/rrd-iptraf/ and http://www.taedium.com/rrd-iptraf/iptraf.txt
 
