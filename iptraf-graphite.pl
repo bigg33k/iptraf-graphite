@@ -40,11 +40,15 @@ while (<$fh>) {
     next unless ( m/^\*\*\*/ );
     _parse( $_, $fh );
 }
+<<<<<<< HEAD
 Net::Statsd::timing('iptraf.'.$site.'.main', Time::HiRes::tv_interval($start_time) * 1000);
 $datestring = localtime();
 print "Stopping $datestring\n";
 
 
+=======
+Net::Statsd::timing('iptraf.'.$site.'.main', Time::HiRes::tv_interval($start_time) * 1000);
+>>>>>>> 92e5cbfe778cc52699c4def9e6c2c235dcba4b03
 ## translate iptraf's time string into unixtime
 sub _get_time {
 
