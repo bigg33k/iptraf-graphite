@@ -40,22 +40,18 @@ while (<$fh>) {
     next unless ( m/^\*\*\*/ );
     _parse( $_, $fh );
 }
-<<<<<<< HEAD
+
 Net::Statsd::timing('iptraf.'.$site.'.main', Time::HiRes::tv_interval($start_time) * 1000);
 $datestring = localtime();
 print "Stopping $datestring\n";
 
-
-=======
-Net::Statsd::timing('iptraf.'.$site.'.main', Time::HiRes::tv_interval($start_time) * 1000);
->>>>>>> 92e5cbfe778cc52699c4def9e6c2c235dcba4b03
 ## translate iptraf's time string into unixtime
 sub _get_time {
 
     my $start_get_time = [ Time::HiRes::gettimeofday ];
     my ($input) = @_;
 
-    my ($day, $month, $date, $hour, $minute, $second, $year) = 
+    my ($day, $month, $date, $hour, $minute, $second, $year) =
             split( /\s+|:/, $input );
 
     $month = $month eq 'Jan' ? 0  :
@@ -95,16 +91,16 @@ sub _parse {
         last if ( m/^Running/ );
         next if ( m/^\s*$/ );
 
-        ## read data 
+        ## read data
         my ($proto) = $_ =~ m/^([^\/]+)/;
         my ($port, $packs, $bytes, $kbits1, $kbits1_right, $pack_in, $byte_in, $kbits2, $kbits2_right, $pack_out, $byte_out, $kbits3) =
             $_ =~ m/(\d+)/g;
 
-        $metrics =   "iptraf.$site.$proto.$port.packets $packs $timestamp\n 
-                      iptraf.$site.$proto.$port.bytes_total $bytes $timestamp\n   
-                      iptraf.$site.$proto.$port.packets_in $pack_in  $timestamp\n  
-                      iptraf.$site.$proto.$port.bytes_in $byte_in $timestamp\n   
-                      iptraf.$site.$proto.$port.packets_out $pack_out  $timestamp\n   
+        $metrics =   "iptraf.$site.$proto.$port.packets $packs $timestamp\n
+                      iptraf.$site.$proto.$port.bytes_total $bytes $timestamp\n
+                      iptraf.$site.$proto.$port.packets_in $pack_in  $timestamp\n
+                      iptraf.$site.$proto.$port.bytes_in $byte_in $timestamp\n
+                      iptraf.$site.$proto.$port.packets_out $pack_out  $timestamp\n
                       iptraf.$site.$proto.$port.bytes_out $byte_out $timestamp\n";
         my $start_metrics_time = [ Time::HiRes::gettimeofday ];
         $sock->send ($metrics);
